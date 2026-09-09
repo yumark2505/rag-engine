@@ -8,7 +8,7 @@ from pathlib import Path
 
 @registry.loader("unstructured")
 class UnstructuredLoader:
-    SUPPORTED_EXTENSIONS = {".pdf", ".docx", ".txt", ".csv", ".xlsx"}
+    SUPPORTED_EXTENSIONS = {".pdf"}
 
     def __init__(self, data_dir: str = "./data/Document"):
         self.data_dir = data_dir
