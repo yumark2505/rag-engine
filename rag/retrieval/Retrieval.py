@@ -4,7 +4,7 @@ from langchain_core.documents import Document
 from rank_bm25 import BM25Okapi
 from rag.registry import registry
 
-@registry.retriever("standard_retriever")
+@registry.retriever("retrieval_vector")
 class VectorSearchRetriever:
     def __init__(self, vector_store, top_k: int = 5):
         """
@@ -35,6 +35,7 @@ class VectorSearchRetriever:
 
         return all_documents
 
+@registry.retriever("retrieval_bm25")
 class BM25SearchRetriever:
     """Sparse Keyword Search an toàn với danh sách query linh hoạt."""
 

@@ -4,7 +4,7 @@ from flashrank import Ranker, RerankRequest
 from rag.registry import registry
 import re
 
-@registry.retriever("post_retrieval_reranker")
+@registry.retriever("post_retrieval_rerank")
 class FlashReranker:
 
     def __init__(
