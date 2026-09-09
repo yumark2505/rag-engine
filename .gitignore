@@ -1,0 +1,29 @@
+# Môi trường ảo Python
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# File cấu hình bảo mật
+.env
+.env.local
+
+# Ẩn toàn bộ tệp Docker
+Dockerfile*
+*.dockerfile
+docker-compose*.yml
+docker-compose*.yaml
+.dockerignore
+
+# Dữ liệu tài liệu lớn và database cục bộ
+data/Document/*.pdf
+*.db
+*.sqlite3
+
+# Thư mục tạm của OS & IDE
+.vscode/
+.idea/
+.DS_Store
