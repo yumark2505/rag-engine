@@ -5,63 +5,30 @@ Hệ thống RAG (Retrieval-Augmented Generation) hoàn chỉnh sử dụng Fast
 ## Kiến trúc
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              CLIENT / FRONTEND                              │
-│                                  Streamlit                                  │
-│                              streamlit/app.py                               │
-│                                                                             │
-│        Upload PDF  •  Lọc theo tài liệu  •  Chọn chiến lược  •  Chat UI      │
-└──────────────────────────────────────┬──────────────────────────────────────┘
-                                       │ HTTP REST / Streaming SSE
-                                       ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                               FASTAPI SERVER                                │
-│                                  main.py                                    │
-│                                                                             │
-│  ┌────────────────────┐   ┌────────────────────┐   ┌─────────────────────┐  │
-│  │      Lifespan      │   │      RAG API       │   │    Document API     │  │
-│  │                    │   │     RagApi.py      │   │     document.py     │  │
-│  │ • Load Registry    │   │                    │   │                     │  │
-│  │ • Init Pipelines   │   │ • /rag/query       │   │ • /documents/list   │  │
-│  │ • CORS Middleware  │   │ • /rag/stream      │   │ • /documents/folder │  │
-│  │                    │   │ • /rag/query/stream│   │ • /documents/upload │  │
-│  └────────────────────┘   └─────────┬──────────┘   │ • /documents/reindex│  │
-│                                     │              └──────────┬──────────┘  │
-│            ┌────────────────────────┘                         │             │
-│            │ (Online Serving Request)                         │ (Async Task)│
-│            ▼                                                  ▼             │
-│  ┌───────────────────────────────────┐      ┌────────────────────────────┐  │
-│  │       RAG SERVING PIPELINE        │      │   RAG INGESTION PIPELINE   │  │
-│  │        RAGServingPipeline         │      │    RAGIngestionPipeline    │  │
-│  │                                   │      │                            │  │
-│  │  1. PRE-RETRIEVAL                 │      │  1. Loader (Unstructured)  │  │
-│  │     • Identity • Transform • HyDE │      │             │              │  │
-│  │     • Contextualize (Chat Memory) │      │             ▼              │  │
-│  │             │                     │      │  2. Chunker                │  │
-│  │             ▼                     │      │     (Recursive / Semantic) │  │
-│  │  2. RETRIEVAL (Metadata Filter)   │      │             │              │  │
-│  │     • Dense Vector (pgvector)     │      │             ▼              │  │
-│  │     • BM25 (Sparse)               │      │  3. Embedding              │  │
-│  │     • Hybrid Search (RRF Fusion)  │      │     (Ollama / OpenAI...)   │  │
-│  │             │                     │      │             │              │  │
-│  │             ▼                     │      │             ▼              │  │
-│  │  3. POST-RETRIEVAL                │      │  4. Vector Store Manager   │  │
-│  │     • FlashRank Reranker          │      │     (PGVector / Metadata)  │  │
-│  │     • Contextual Compression      │      └─────────────┬──────────────┘  │
-│  │             │                     │                    │                 │
-│  │             ▼                     │                    │                 │
-│  │  4. GENERATION                    │                    │                 │
-│  │     • Ollama / OpenAI / vLLM      │                    │                 │
-│  │     • Multi-turn Memory update    │                    │                 │
-│  └─────────────┬─────────────────────┘                    │                 │
-│                │                                          │                 │
-└────────────────┼──────────────────────────────────────────┼─────────────────┘
-                 │ Read Vectors / Filter Query              │ Write Vectors
-                 ▼                                          ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                           DATABASE & VECTOR STORE                           │
-│                   PostgreSQL + pgvector (Container Docker)                  │
-└─────────────────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────┐
+│               STREAMLIT UI (streamlit/app.py)                          │
+│     Upload PDF  •  Lọc Metadata  •  Chọn chiến lược  •  Multi-turn     │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │ HTTP REST / SSE Stream
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                        FASTAPI GATEWAY (main.py)                       │
+│     /rag/query, /rag/stream  •  /documents/upload, /documents/list     │
+└───────────────┬────────────────────────────────────────┬───────────────┘
+                │ Online Query                           │ Ingest / Reindex
+                ▼                                        ▼
+┌──────────────────────────────────────┐  ┌──────────────────────────────┐
+│        RAG SERVING PIPELINE          │  │    RAG INGESTION PIPELINE    │
+│ • Pre: Identity / Transform / HyDE   │  │ • Loader: Unstructured       │
+│ • Retrieval: Vector / BM25 / Hybrid  │  │ • Chunker: Recursive/Semantic│
+│ • Post: FlashRank Reranker           │  │ • Embedder: Ollama / nomic   │
+│ • Gen: Local Ollama / vLLM / OpenAI  │  │ • Store: VectorStore Manager │
+└──────────────────┬───────────────────┘  └──────────────┬───────────────┘
+                   │ Search / Filter                     │ Write Vectors
+                   ▼                                     ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│          DATABASE: PostgreSQL + pgvector (Docker Container)            │
+└────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Cấu trúc thư mục
