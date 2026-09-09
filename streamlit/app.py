@@ -59,7 +59,7 @@ with st.sidebar:
         if folder_files:
             for idx, fname in enumerate(folder_files, 1):
                 is_indexed = fname in indexed_docs
-                status_text = "✅ Đã nạp" if is_indexed else "⚠️ Chưa index"
+                status_text = "Đã nạp" if is_indexed else "Chưa index"
                 st.caption(f"**{idx}.** `{fname}` — *{status_text}*")
         else:
             st.caption("Thư mục `data/Document/` đang trống.")
@@ -199,7 +199,7 @@ with st.sidebar:
     )
 
     if selected_doc != "Tất cả":
-        if st.button(f"🗑️ Xóa tệp '{selected_doc}'", use_container_width=True):
+        if st.button(f"Xóa tệp '{selected_doc}'", use_container_width=True):
             with st.spinner("Đang xóa tài liệu khỏi database..."):
                 try:
                     del_res = requests.delete(
