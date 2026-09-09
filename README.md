@@ -167,7 +167,13 @@ ollama pull nomic-embed-text:latest
 
 ### 5. Nạp dữ liệu Offline
 
-Đặt các tệp PDF vào thư mục `data/Document/`. Server sẽ tự động nạp khi khởi động.
+Đặt các tệp PDF vào thư mục `data/Document/`
+
+- Cách 1: Chạy script nạp offline:
+  ```bash
+  python test_ingest.py
+
+ - Cách 2: Bật giao diện Streamlit, các tệp PDF có sẵn trong data/Document/ sẽ hiển thị ở Sidebar; bấm nút "Áp dụng & Re-index kho dữ liệu" để nạp trực tiếp qua API.
 
 ## Chạy
 
