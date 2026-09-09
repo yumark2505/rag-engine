@@ -195,6 +195,26 @@ streamlit run streamlit/app.py
 
 Mở trình duyệt tại `http://localhost:8501`
 
+## Giao diện Người dùng (Streamlit Sandbox UI)
+
+Hệ thống cung cấp một Sandbox tương tác trực quan (`frontend/app.py`), cho phép người dùng thử nghiệm và đánh giá động các chiến lược RAG:
+
+* **Quản lý Tài liệu Nền (Document Ingestion)**:
+  * Hiển thị danh sách tệp PDF thực tế trong thư mục `data/Document/` kèm trạng thái kiểm tra đối chiếu (`Đã nạp` hoặc ` Chưa index`).
+  * Tùy chọn thuật toán phân đoạn (Recursive, Tiktoken, Semantic) và mô hình Embedding (Ollama, OpenAI, Google).
+  * Nút bấm thực thi Re-index toàn bộ kho dữ liệu bất đồng bộ qua Background Tasks.
+* **Phạm vi Tìm kiếm (Metadata Isolation)**:
+  * Dropdown chọn truy vấn trên `Tất cả` tài liệu hoặc cô lập đích danh 1 tệp PDF để loại bỏ nhiễu chéo (Vector Dilution).
+  * Tích hợp thao tác xóa tệp và dọn dẹp sạch toàn bộ vector liên quan khỏi PostgreSQL.
+* **Tùy biến Chiến lược Serving Động**:
+  * **Pre-retrieval**: Chuyển đổi linh hoạt giữa `Identity`, `Query Transform` (phân rã câu hỏi) và `HyDE` (văn bản giả định).
+  * **Retrieval Engine**: Lựa chọn giữa `Dense Vector` (pgvector), `BM25` (từ khóa thưa) hoặc `Hybrid Search` (kết hợp RRF).
+  * **Post-retrieval**: Tinh chỉnh bộ xếp hạng lại `FlashRank Reranker` hoặc `Contextual Compression`.
+* **Trải nghiệm Hội thoại & Quan sát**:
+  * Hỗ trợ chế độ sinh câu trả lời tức thời (Token Streaming) hoặc JSON hoàn chỉnh.
+  * Hộp mở rộng hiển thị các truy vấn con đã mở rộng và trích dẫn chi tiết (Filename, nội dung chunk, điểm Rerank Score).
+  * Tự động duy trì phiên hội thoại đa lượt (Multi-turn Chat Memory).
+
 ## API Reference
 
 ### Health Check
