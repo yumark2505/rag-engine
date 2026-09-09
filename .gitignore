@@ -27,3 +27,7 @@ data/Document/*.pdf
 .vscode/
 .idea/
 .DS_Store
+
+opt/
+.DS_Store
+__MACOSX/
