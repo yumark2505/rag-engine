@@ -46,7 +46,7 @@ Fastapi-rag/
 ├── data/
 │   └── Document/                     # Tài liệu nạp vào (.pdf, .docx, .txt...)
 │
-├── frontend/                         # Giao diện Streamlit
+├── streamlit/                         # Giao diện Streamlit
 │   └── app.py                        # Streamlit UI đa chiến lược + Chat Memory
 │
 ├── opt/                              # FlashRank cache directory
@@ -187,10 +187,10 @@ Server sẽ tự động:
 1. **Phase 1 (Ingestion)**: Nạp toàn bộ tài liệu trong `data/Document/` → chunk → embed → lưu vào pgvector
 2. **Phase 2 (Serving)**: Khởi tạo `RAGServingPipeline` để phục vụ truy vấn
 
-### Khởi động Frontend (Streamlit)
+### Khởi động  Streamlit
 
 ```bash
-streamlit run frontend/app.py
+streamlit run streamlit/app.py
 ```
 
 Mở trình duyệt tại `http://localhost:8501`
