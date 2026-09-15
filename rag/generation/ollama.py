@@ -11,8 +11,8 @@ class OllamaGenerator(BaseGenerator):
 
     def __init__(
         self,
-        model_name: str = settings.LLM_MODEL,  
-        base_url: str = settings.OLLAMA_BASE_URL,  
+        model_name: str = settings.OLLAMA_MODEL,
+        base_url: str = settings.OLLAMA_BASE_URL,
         **kwargs,
     ):
         super().__init__(**kwargs)

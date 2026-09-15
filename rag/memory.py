@@ -25,5 +25,8 @@ class ChatMemory:
             ChatMessage(role="assistant", content=content)
         )
 
+    def clear(self, session_id: str = "default_session") -> None:
+        self._messages.pop(session_id, None)
+
 
 chat_memory = ChatMemory()

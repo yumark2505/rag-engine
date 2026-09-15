@@ -10,9 +10,9 @@ from config import settings
 class OllamaEmbedder(Embeddings):
     def __init__(
         self,
-        model_name: str = settings.EMBEDDING_MODEL,
+        model_name: str = settings.OLLAMA_EMBEDDING_MODEL,
         base_url: str = settings.OLLAMA_BASE_URL,
-        batch_size: int = settings.BATCH_SIZE,
+        batch_size: int = settings.OLLAMA_BATCH_SIZE,
     ):
         self.model_name = model_name
         self.client = ollama.Client(host=base_url)

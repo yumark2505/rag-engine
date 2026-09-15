@@ -12,13 +12,13 @@ class RAGServingPipeline:
         self,
         vector_store,
         top_k: int = settings.TOP_K,
-        top_n: int = 3,
+        top_n: int = settings.DEFAULT_TOP_N,
     ):
         self.vector_store = vector_store
         self.top_k = top_k
         self.top_n = top_n
 
-    def _get_generator(self, provider: str = "ollama"):
+    def _get_generator(self, provider: str = settings.DEFAULT_LLM_PROVIDER):
         generator_cls = registry.get_generator(provider)
         if not generator_cls:
             generator_cls = registry.get_generator("ollama")
@@ -109,12 +109,12 @@ class RAGServingPipeline:
         query: str,
         session_id: str = "default_session",
         selected_document: Optional[str] = None,
-        llm_provider: str = "ollama",
+        llm_provider: str = settings.DEFAULT_LLM_PROVIDER,
         top_k: Optional[int] = None,
         top_n: Optional[int] = None,
         pre_retrieval_strategy: str = "identity",
-        retrieval_strategy: str = "vector",
-        post_retrieval_strategy: str = "rerank",
+        retrieval_strategy: str = settings.DEFAULT_RETRIEVAL_STRATEGY,
+        post_retrieval_strategy: str = settings.DEFAULT_POST_RETRIEVAL_STRATEGY,
         **kwargs,
     ) -> Dict[str, Any]:
         history = chat_memory.get_messages(session_id)
@@ -162,12 +162,12 @@ class RAGServingPipeline:
         query: str,
         session_id: str = "default_session",
         selected_document: Optional[str] = None,
-        llm_provider: str = "ollama",
-        top_k: int = 8,
-        top_n: int = 5,
+        llm_provider: str = settings.DEFAULT_LLM_PROVIDER,
+        top_k: int = settings.TOP_K,
+        top_n: int = settings.DEFAULT_TOP_N,
         pre_retrieval_strategy: str = "identity",
-        retrieval_strategy: str = "vector",
-        post_retrieval_strategy: str = "rerank",
+        retrieval_strategy: str = settings.DEFAULT_RETRIEVAL_STRATEGY,
+        post_retrieval_strategy: str = settings.DEFAULT_POST_RETRIEVAL_STRATEGY,
         **kwargs,
     ) -> Iterator[str]:
         history = chat_memory.get_messages(session_id)

@@ -30,9 +30,15 @@ class Settings(BaseSettings):
 
     # ── Ollama Provider ──────────────────────────────────────────
     OLLAMA_BASE_URL: str = Field(default="http://127.0.0.1:11434")
-    LLM_MODEL: str = Field(default="qwen3:8b")
-    EMBEDDING_MODEL: str = Field(default="nomic-embed-text:latest")
-    BATCH_SIZE: int = Field(default=64)
+    OLLAMA_MODEL: str = Field(default="qwen3:8b")
+    OLLAMA_EMBEDDING_MODEL: str = Field(default="nomic-embed-text:latest")
+    OLLAMA_BATCH_SIZE: int = Field(default=64)
+
+    # ── Pipeline Defaults ──────────────────────────────────────
+    DEFAULT_LLM_PROVIDER: str = "ollama"
+    DEFAULT_TOP_N: int = 3
+    DEFAULT_RETRIEVAL_STRATEGY: str = "vector"
+    DEFAULT_POST_RETRIEVAL_STRATEGY: str = "rerank"
 
     # ── OpenAI Provider ──────────────────────────────────────────
     OPENAI_API_KEY: str = Field(default="")

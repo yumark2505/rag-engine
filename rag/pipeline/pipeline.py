@@ -1,4 +1,5 @@
 from typing import Optional, Dict, Any
+from config import settings
 from rag.pipeline.ingestion import RAGIngestionPipeline
 from rag.pipeline.serving import RAGServingPipeline
 
@@ -13,8 +14,8 @@ class Pipeline:
         chunker_name: str = "recursive",
         embedder_name: str = "ollama",
         vector_store_name: str = "pgvector",
-        top_k: int = 8,
-        top_n: int = 3,
+        top_k: int = settings.TOP_K,
+        top_n: int = settings.DEFAULT_TOP_N,
     ):
         self.ingestion = RAGIngestionPipeline(
             data_dir=data_dir,
@@ -37,12 +38,12 @@ class Pipeline:
         query: str,
         session_id: str = "default_session",
         selected_document: Optional[str] = None,
-        llm_provider: str = "ollama",
+        llm_provider: str = settings.DEFAULT_LLM_PROVIDER,
         top_k: Optional[int] = None,
         top_n: Optional[int] = None,
         pre_retrieval_strategy: str = "identity",
-        retrieval_strategy: str = "vector",
-        post_retrieval_strategy: str = "rerank",
+        retrieval_strategy: str = settings.DEFAULT_RETRIEVAL_STRATEGY,
+        post_retrieval_strategy: str = settings.DEFAULT_POST_RETRIEVAL_STRATEGY,
         **kwargs,
     ) -> Dict[str, Any]:
         return self.serving.run(
@@ -63,12 +64,12 @@ class Pipeline:
         query: str,
         session_id: str = "default_session",
         selected_document: Optional[str] = None,
-        llm_provider: str = "ollama",
-        top_k: int = 8,
-        top_n: int = 5,
+        llm_provider: str = settings.DEFAULT_LLM_PROVIDER,
+        top_k: int = settings.TOP_K,
+        top_n: int = settings.DEFAULT_TOP_N,
         pre_retrieval_strategy: str = "identity",
-        retrieval_strategy: str = "vector",
-        post_retrieval_strategy: str = "rerank",
+        retrieval_strategy: str = settings.DEFAULT_RETRIEVAL_STRATEGY,
+        post_retrieval_strategy: str = settings.DEFAULT_POST_RETRIEVAL_STRATEGY,
         **kwargs,
     ):
         return self.serving.stream_answer(

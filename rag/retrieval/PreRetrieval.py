@@ -19,7 +19,7 @@ class IdentityQueryOptimizer:
 class QueryOptimizer:
     def __init__(
         self,
-        model_name: str = settings.LLM_MODEL,
+        model_name: str = settings.OLLAMA_MODEL,
         base_url: str = settings.OLLAMA_BASE_URL,
     ):
         self.model_name = model_name
@@ -94,7 +94,7 @@ class HyDEOptimizer:
 
     def __init__(
         self,
-        model_name: str = settings.LLM_MODEL,
+        model_name: str = settings.OLLAMA_MODEL,
         base_url: str = settings.OLLAMA_BASE_URL,
     ):
         self.model_name = model_name
