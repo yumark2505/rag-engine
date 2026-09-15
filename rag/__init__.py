@@ -5,6 +5,6 @@ import rag.retrieval
 import rag.prompt
 import rag.generation
 
-from rag.pipeline import RAGIngestionPipeline, RAGServingPipeline
+from rag.pipeline import RAGIngestionPipeline, RAGServingPipeline, Pipeline
 
-__all__ = ["registry", "RAGIngestionPipeline", "RAGServingPipeline"]
+__all__ = ["registry", "RAGIngestionPipeline", "RAGServingPipeline", "Pipeline"]

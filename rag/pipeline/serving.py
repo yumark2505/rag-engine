@@ -5,75 +5,6 @@ from rag.memory import chat_memory
 from rag.registry import registry
 
 
-class RAGIngestionPipeline:
-    """Phase 1: Offline Ingestion — quét file, chunk, embed, lưu vào pgvector."""
-
-    def __init__(
-        self,
-        data_dir: str = "./data/Document",
-        loader_name: str = "unstructured",
-        chunker_name: str = "recursive",
-        embedder_name: str = "ollama",
-        vector_store_name: str = "pgvector",
-    ):
-        self.data_dir = data_dir
-
-        loader_cls = registry.get_loader(loader_name)
-        if not loader_cls:
-            raise ValueError(f"Loader '{loader_name}' chưa được đăng ký!")
-        self.loader = loader_cls()
-
-        chunker_cls = registry.get_chunker(chunker_name)
-        if not chunker_cls:
-            raise ValueError(f"Chunker '{chunker_name}' chưa được đăng ký!")
-
-        try:
-            self.chunker = chunker_cls(
-                chunk_size=settings.CHUNK_SIZE,
-                chunk_overlap=settings.CHUNK_OVERLAP,
-            )
-        except TypeError:
-            self.chunker = chunker_cls()
-
-        embedder_cls = registry.get_embedder(embedder_name)
-        if not embedder_cls:
-            raise ValueError(f"Embedder '{embedder_name}' chưa được đăng ký!")
-        self.embedder = embedder_cls()
-
-        vector_store_cls = registry.get_vector_store(vector_store_name)
-        if not vector_store_cls:
-            raise ValueError(f"VectorStore '{vector_store_name}' chưa được đăng ký!")
-        self.vector_store = vector_store_cls(embeddings=self.embedder)
-
-    def ingest(self, overwrite: bool = False) -> Dict[str, Any]:
-        """Quét data_dir -> load -> chunk -> lưu vào pgvector."""
-        if overwrite and hasattr(self.vector_store, "clear"):
-            self.vector_store.clear()
-
-        documents = self.loader.load_all()
-        if not documents:
-            return {
-                "status": "no_documents",
-                "message": f"Không tìm thấy tài liệu trong '{self.data_dir}'.",
-            }
-
-        chunks = self.chunker.split(documents)
-        if not chunks:
-            return {
-                "status": "no_chunks",
-                "message": "Không tạo được chunk từ tài liệu.",
-            }
-
-        self.vector_store.add_documents(chunks)
-
-        return {
-            "status": "success",
-            "total_documents": len(documents),
-            "total_chunks": len(chunks),
-            "message": f"Đã nạp thành công {len(chunks)} chunks vào database.",
-        }
-
-
 class RAGServingPipeline:
     """Phase 2: Online Serving — retrieve + rerank + memory + multi-llm generation."""
 
@@ -88,7 +19,6 @@ class RAGServingPipeline:
         self.top_n = top_n
 
     def _get_generator(self, provider: str = "ollama"):
-        """Lấy class Generator trực tiếp từ registry, fallback về ollama nếu không tìm thấy."""
         generator_cls = registry.get_generator(provider)
         if not generator_cls:
             generator_cls = registry.get_generator("ollama")
@@ -109,12 +39,10 @@ class RAGServingPipeline:
         effective_top_k = top_k if top_k is not None else self.top_k
         effective_top_n = top_n if top_n is not None else self.top_n
 
-        # Xây dựng filter theo metadata filename
         filter_dict = None
         if selected_document and selected_document != "Tất cả":
             filter_dict = {"filename": selected_document}
 
-        # ── 1. PRE-RETRIEVAL ──────────────────────────
         pre_strategy_key = "query_optimizer" if pre_strategy == "query_transform" else pre_strategy
         pre_cls = registry.get_retriever(f"pre_retrieval_{pre_strategy_key}")
         if pre_cls:
@@ -123,7 +51,6 @@ class RAGServingPipeline:
         else:
             sub_queries = [query]
 
-        # ── 2. RETRIEVAL ──────────────────────────────
         raw_docs: List[Document] = []
         seen_texts = set()
 
@@ -136,7 +63,6 @@ class RAGServingPipeline:
 
             for q in sub_queries:
                 if hasattr(retriever, "search"):
-                    # Kiểm tra xem search() của retriever có nhận filter_dict hay không
                     try:
                         docs = retriever.search(q, top_k=effective_top_k, filter_dict=filter_dict)
                     except TypeError:
@@ -164,7 +90,6 @@ class RAGServingPipeline:
                         seen_texts.add(doc.page_content)
                         raw_docs.append(doc)
 
-        # ── 3. POST-RETRIEVAL ─────────────────────────
         post_cls = registry.get_retriever(f"post_retrieval_{post_strategy}")
         if post_cls:
             processor = post_cls(top_n=effective_top_n)
